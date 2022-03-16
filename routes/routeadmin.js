@@ -5,4 +5,5 @@ router.post('/admin/register',admincrud.register)
 router.post('/admin/login',admincrud.login)
 router.post('/admin/updateroles',auth,admincrud.updateroles)
 router.post('/admin/assign_roles',auth,admincrud.assignuser)
+router.delete('/admin/unassignManeger',auth,admincrud.unassignmanager)
 module.exports = router

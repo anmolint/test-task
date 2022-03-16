@@ -6,8 +6,20 @@ const assignuser =sequelize.define('userassign',{
         autoIncrement: true,
         primaryKey: true
     },
-    maneger:{type: Sequelize.INTEGER},
-    user:{type: Sequelize.INTEGER}
+    maneger:{
+        type: Sequelize.INTEGER,
+        unique: true,
+        references: {
+            model: 'userstorages',
+            key: 'id',
+        }},
+    user:{
+        type: Sequelize.INTEGER,
+        unique: true,
+        references: {
+            model: 'userstorages',
+            key: 'id',
+        }}
 
 });
 assignuser.sync();

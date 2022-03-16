@@ -6,16 +6,16 @@ const task = sequelize.define('task', {
         autoIncrement: true,
         primaryKey: true
     },
-    // manegerid: {
-    //     type: Sequelize.INTEGER,
-    //     references: {
-    //         model: 'userassign',
-    //         key: 'maneger',
-    //     }
-    // },
+    manegerid: {
+        type: Sequelize.INTEGER,
+        references: {
+            model: 'userstorages',
+            key: 'id',
+        }
+    },
     task: { type: Sequelize.STRING },
     status: { type: Sequelize.STRING }
 }
 );
-task.sync({ force: true });
+task.sync();
 module.exports = task;

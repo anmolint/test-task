@@ -7,8 +7,9 @@ const tokenVerification = async (req, res, next) => {
       res.send(" auth token required");
     } else {
       let decode = jwt.verify(tkn, "abcd");
-      let user = await dbops.dataWrite.findOne({
-        where: { id:decode.registration}
+      console.log(decode,'saasaaaaaaaaaaaaaaaaaaaaadasadasdasdasxxxxxxxxxxxxxxxxxxxxx')
+      let user = await dbops.admindata.findOne({
+        where: { id:decode.user_id}
     });
     if (user.role ==="maneger"||user.role=="admin"){
       req.user =decode;

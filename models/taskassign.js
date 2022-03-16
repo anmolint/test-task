@@ -6,8 +6,27 @@ const assigntask =sequelize.define('taskassign',{
         autoIncrement: true,
         primaryKey: true
     },
-    manegerid:{type: Sequelize.INTEGER},
-    userid:{type: Sequelize.INTEGER}
+    taskid:{
+        type: Sequelize.INTEGER,
+        references: {
+            model: 'tasks',
+            key: 'id',
+        }},
+    manegerid:{
+        type: Sequelize.INTEGER,
+        references: {
+            model: 'userstorages',
+            key: 'id',
+        }
+    },
+    userid:{
+        type: Sequelize.INTEGER,
+        references: {
+            model: 'userstorages',
+            key: 'id',
+        }
+    },
+   
 });
-assigntask.sync({force:true})
+assigntask.sync()
 module.exports = assigntask
