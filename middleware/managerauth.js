@@ -7,7 +7,6 @@ const tokenVerification = async (req, res, next) => {
       res.send(" auth token required");
     } else {
       let decode = jwt.verify(tkn, "abcd");
-      console.log(decode,'saasaaaaaaaaaaaaaaaaaaaaadasadasdasdasxxxxxxxxxxxxxxxxxxxxx')
       let user = await dbops.admindata.findOne({
         where: { id:decode.user_id}
     });

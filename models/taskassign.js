@@ -12,13 +12,6 @@ const assigntask =sequelize.define('taskassign',{
             model: 'tasks',
             key: 'id',
         }},
-    manegerid:{
-        type: Sequelize.INTEGER,
-        references: {
-            model: 'userstorages',
-            key: 'id',
-        }
-    },
     userid:{
         type: Sequelize.INTEGER,
         references: {
@@ -28,5 +21,5 @@ const assigntask =sequelize.define('taskassign',{
     },
    
 });
-assigntask.sync()
+assigntask.sync({alter:true})
 module.exports = assigntask

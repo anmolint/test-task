@@ -1,5 +1,6 @@
 const sequelize = require('../db/network')
 const { Sequelize } = require("sequelize")
+const userStorage = require('./adminmodel')
 const assignuser =sequelize.define('userassign',{
     id: {
         type: Sequelize.INTEGER,
@@ -8,19 +9,20 @@ const assignuser =sequelize.define('userassign',{
     },
     maneger:{
         type: Sequelize.INTEGER,
-        unique: true,
         references: {
             model: 'userstorages',
-            key: 'id',
         }},
     user:{
         type: Sequelize.INTEGER,
-        unique: true,
         references: {
             model: 'userstorages',
-            key: 'id',
         }}
 
 });
-assignuser.sync();
+try {
+    
+    assignuser.sync({alter: true});
+} catch (error) {
+    console.log(error, 'llllllllllllllllllllllllll');
+}
 module.exports = assignuser

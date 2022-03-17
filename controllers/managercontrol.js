@@ -1,6 +1,9 @@
 const dbops = require("../models/index");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const userStorage = require("../models/adminmodel");
+const models = require("../models/index");
+const { assinment } = require("../models/index");
 
 const login = async (req, res) => {
   try {
@@ -29,12 +32,15 @@ const login = async (req, res) => {
 const checkUsers = async (req, res) => {
   try {
     let uid = req.user;
-    console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!',uid)
-    let userlist = await dbops.assinment.findAll({
+    
+    let userlist = await dbops.admindata.findAll({
       where: {
-        maneger: uid.user_id,
-      }
-    });
+        include:[{
+          model:models.admindata,
+            through:models.assinment,
+            where: { maneger: uid.user_id,},
+        }]
+    }});
     res.send(userlist);
   } catch (error) {
     console.log(error);

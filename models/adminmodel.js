@@ -1,5 +1,8 @@
 const sequelize = require("../db/network");
 const { Sequelize } = require("sequelize");
+const assignuser = require("./userassign");
+const task = require("./tasks");
+const assignTask = require("./taskassign");
 const userStorage = sequelize.define("userstorage", {
   id: {
     type: Sequelize.INTEGER,
@@ -15,5 +18,17 @@ const userStorage = sequelize.define("userstorage", {
   phonenumber: { type: Sequelize.INTEGER },
   address: { type: Sequelize.STRING },
 });
-userStorage.sync();
+userStorage.associate = function (models) {
+  models.userStorage.hasMany(models.userStorage, {
+    through: models.assignuser,
+    as: "users",
+    foreignKey: "user",
+  });
+  models.userStorage.belongsTo(models.userStorage, {
+    through: models.assignuser,
+    as: "manegers",
+    foreignKey: "maneger",
+  });
+};
+userStorage.sync({ alter: true });
 module.exports = userStorage;

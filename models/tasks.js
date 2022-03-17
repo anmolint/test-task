@@ -17,5 +17,10 @@ const task = sequelize.define('task', {
     status: { type: Sequelize.STRING }
 }
 );
-task.sync();
+try {
+    
+    task.sync({alter: true});
+} catch (error) {
+    console.log(error);
+}
 module.exports = task;
