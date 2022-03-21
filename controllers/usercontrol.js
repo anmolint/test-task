@@ -1,6 +1,7 @@
 const dbops = require("../models/index");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+require("dotenv").config();
 const register = async (req, res) => {
   try {
     let saltRounds = await bcrypt.genSalt(10);
@@ -15,7 +16,7 @@ const register = async (req, res) => {
       phonenumber: req.body.phonenumber,
       address: req.body.address,
     });
-    let token = jwt.sign({ registration: admindatacreate.id }, "abcd", {
+    let token = jwt.sign({ registration: admindatacreate.id }, process.env.key, {
       expiresIn: "1h",
     });
     res.send(token);
@@ -35,7 +36,7 @@ const login = async (req, res) => {
     if (user) {
       let decryption = await bcrypt.compare(req.body.password, user.password);
       if (decryption == true) {
-        let token = jwt.sign({ user_id: user.id }, "abcd", {
+        let token = jwt.sign({ user_id: user.id }, process.env.key, {
           expiresIn: "1h",
         });
         res.send(token);

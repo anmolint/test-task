@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const { validationResult }
     = require('express-validator');
 const User = require("../models/user");
+require("dotenv").config();
 const register = async (req, res) => {
   try {
     const data = validationResult(req)
@@ -22,7 +23,7 @@ const register = async (req, res) => {
       phonenumber: req.body.phonenumber,
       address: req.body.address,
     });
-    let token = jwt.sign({ registration: admindatacreate.id }, "abcd", {
+    let token = jwt.sign({ registration: admindatacreate.id }, process.env.key, {
       expiresIn: "1h",
     });
     res.send(token);
@@ -46,7 +47,7 @@ const login = async (req, res) => {
       if (user.role === "admin") {
         let decryption = await bcrypt.compare(req.body.password, user.password);
         if (decryption == true) {
-          let token = jwt.sign({ user_id: user.id }, "abcd", {
+          let token = jwt.sign({ user_id: user.id }, process.env.key, {
             expiresIn: "1h",
           });
           res.send(token);

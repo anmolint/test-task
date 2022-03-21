@@ -1,13 +1,13 @@
 const jwt = require("jsonwebtoken");
 const dbops = require("../models/index");
+require("dotenv").config();
 const tokenVerification = async (req, res, next) => {
   try {
     const tkn = req.headers.id;
-    console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!',req.headers.tid)
     if (!tkn) {
       res.send(" auth token required");
     } else {
-      let decode = jwt.verify(tkn, "abcd");
+      let decode = jwt.verify(tkn, process.env.key);
       let user = await dbops.admindata.findOne({
         where: { id: decode.user_id },
       });

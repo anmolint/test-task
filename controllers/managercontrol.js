@@ -2,6 +2,7 @@ const dbops = require("../models/index");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { validationResult } = require("express-validator");
+require("dotenv").config();
 
 const login = async (req, res) => {
   try {
@@ -15,7 +16,7 @@ const login = async (req, res) => {
     if (user.role == "manager") {
       let decryption = await bcrypt.compare(req.body.password, user.password);
       if (decryption == true) {
-        let token = jwt.sign({ user_id: user.id }, "abcd", {
+        let token = jwt.sign({ user_id: user.id }, process.env.key, {
           expiresIn: "1h",
         });
         res.send(token);
@@ -62,7 +63,7 @@ const createtask = async (req, res) => {
       description: req.body.description,
       status: req.body.status,
     });
-    let token = jwt.sign({ user_id: taskcreate.id }, "abcd", {
+    let token = jwt.sign({ user_id: taskcreate.id }, process.env.key, {
       expiresIn: "1h",
     });
     res.send(token);
@@ -81,7 +82,7 @@ const updateTask = async (req, res) => {
       res.send(data);
     }
     let uid = req.user;
-    let tid = jwt.verify(req.headers.tid, "abcd");
+    let tid = jwt.verify(req.headers.tid, process.env.key);
     let taskcreate = await dbops.taskcreate.update(
       {
         description: req.body.description,
@@ -101,7 +102,7 @@ const updateTask = async (req, res) => {
 const deletetask = async (req, res) => {
   try {
     let uid = req.user;
-    let tid = jwt.verify(tkn, "abcd");
+    let tid = jwt.verify(tkn, process.env.key);
     let task = await dbops.taskcreate.findOne({
       where: { id: tid.user_id },
     });
@@ -126,7 +127,7 @@ const assigntask = async (req, res) => {
       res.send(data);
     }
     let uid = req.user;
-    let tid = jwt.verify(req.headers.taskid, "abcd");
+    let tid = jwt.verify(req.headers.taskid, process.env.key);
     let user = await dbops.admindata.findOne({
       where: { username: req.body.user },
     });
@@ -157,7 +158,7 @@ const rateTask = async (req, res) => {
     if (!data.isEmpty()) {
       res.send(data);
     }
-    let tid = jwt.verify(req.headers.tid, "abcd");
+    let tid = jwt.verify(req.headers.tid, process.env.key);
     let task = await dbops.taskcreate.findOne({ where: { id: tid.user_id } });
     if (task.status !== "completed") {
       res.send("task not completed");
