@@ -8,7 +8,7 @@ const login = async (req, res) => {
   try {
     const data = validationResult(req);
     if (!data.isEmpty()) {
-      res.send(data);
+     res.status(400).json(data);
     }
     let user = await dbops.admindata.findOne({
       where: { username: req.body.username },
@@ -19,17 +19,14 @@ const login = async (req, res) => {
         let token = jwt.sign({ user_id: user.id }, process.env.key, {
           expiresIn: "1h",
         });
-        res.send(token);
+       res.status(200).json(token);
       }
     } else {
-      res.send("invalid login ");
+     res.status(400).json("invalid login ");
     }
   } catch (error) {
     console.log(error);
-    res.json({
-      status: 0,
-      message: error,
-    });
+   res.status(400).json(error)
   }
 };
 const checkUsers = async (req, res) => {
@@ -42,20 +39,17 @@ const checkUsers = async (req, res) => {
         id: uid,
       },
     });
-    res.send(userList);
+   res.status(200).json(userList);
   } catch (error) {
     console.log(error);
-    res.json({
-      status: 0,
-      message: error,
-    });
+   res.status(400).json(error)
   }
 };
 const createtask = async (req, res) => {
   try {
     const data = validationResult(req);
     if (!data.isEmpty()) {
-      res.send(data);
+     res.status(400).json(data);
     }
     let uid = req.user;
     let taskcreate = await dbops.taskcreate.create({
@@ -63,118 +57,141 @@ const createtask = async (req, res) => {
       description: req.body.description,
       status: req.body.status,
     });
-    let token = jwt.sign({ user_id: taskcreate.id }, process.env.key, {
-      expiresIn: "1h",
-    });
-    res.send(token);
+   res.status(200).json(taskcreate.id);
   } catch (error) {
     console.log(error);
-    res.json({
-      status: 0,
-      message: error,
-    });
+   res.status(400).json(error)
   }
 };
 const updateTask = async (req, res) => {
   try {
     const data = validationResult(req);
     if (!data.isEmpty()) {
-      res.send(data);
+     res.status(400).json(data);
     }
     let uid = req.user;
-    let tid = jwt.verify(req.headers.tid, process.env.key);
+    let tid = req.body.taskId
     let taskcreate = await dbops.taskcreate.update(
       {
         description: req.body.description,
         status: req.body.status,
       },
-      { where: { managerid: uid.user_id, id: tid.user_id } }
+      { where: { managerid: uid.user_id, id: tid } }
     );
-    res.send("task updated");
+   res.status(200).json("task updated");
   } catch (error) {
     console.log(error);
-    res.json({
-      status: 0,
-      message: error,
-    });
+   res.status(400).json("you cannot update the task")
   }
 };
 const deletetask = async (req, res) => {
-  try {
+  try {const data = validationResult(req);
+    if (!data.isEmpty()) {
+     res.status(400).json(data);
+    }
     let uid = req.user;
-    let tid = jwt.verify(tkn, process.env.key);
+    let tid = req.body.taskId;
     let task = await dbops.taskcreate.findOne({
-      where: { id: tid.user_id },
+      where: { id: tid },
     });
-    if (task) {
-      await dbops.taskcreate.destroy({ where: { id: uid.user_id } });
-      res.send("task deleted");
+    if (task.managerId==uid.user_id) {
+      await dbops.taskcreate.destroy({ where: { id: tid } });
+     res.status(200).json("task deleted");
     } else {
-      res.send("no such task");
+     res.status(400).json("no such task");
     }
   } catch (error) {
     console.log(error);
-    res.json({
-      status: 0,
-      message: error,
-    });
+   res.status(400).json("you did not create such task")
   }
 };
 const assigntask = async (req, res) => {
   try {
     const data = validationResult(req);
     if (!data.isEmpty()) {
-      res.send(data);
+     res.status(400).json(data);
     }
     let uid = req.user;
-    let tid = jwt.verify(req.headers.taskid, process.env.key);
+    let tid = req.body.taskId
     let user = await dbops.admindata.findOne({
       where: { username: req.body.user },
     });
+    let task = await dbops.taskcreate.findOne({where:{id:tid}})
     if (user.managerId !== uid.user_id) {
-      res.send("user is not assigned to you");
+     res.status(400).json("user is not assigned to you");
     } else {
+      if(uid.user_id==task.managerId){
       let assignTask = dbops.taskassgin.create({
-        taskId: tid.user_id,
+        taskId: tid,
         userId: user.id,
       });
       if (assignTask) {
-        res.status(200).send("task assigned");
-      } else {
-        res.status(400).send();
+        res.status(200).json("task assigned");
+      } }else {
+        res.status(400).json("task cannot be assigned");
       }
     }
   } catch (error) {
     console.log(error);
-    res.json({
-      status: 0,
-      message: error,
-    });
+   res.status(400).json(error)
   }
 };
 const rateTask = async (req, res) => {
   try {
     const data = validationResult(req);
     if (!data.isEmpty()) {
-      res.send(data);
+     res.status(400).json(data);
     }
-    let tid = jwt.verify(req.headers.tid, process.env.key);
-    let task = await dbops.taskcreate.findOne({ where: { id: tid.user_id } });
+    let uid = req.user
+    let tid = req.body.taskId
+    let task = await dbops.taskcreate.findOne({ where: { id:tid } });
+    if(uid.user_id==task.managerId){
     if (task.status !== "completed") {
-      res.send("task not completed");
+     res.status(400).json("task not completed");
     } else {
       await dbops.taskcreate.update(
         { rating: req.body.rating },
         { where: { id: task.id } }
       );
-      res.send("task rated ");
-    }
+     res.status(200).json("task rated ");
+    }}
+    else{res.status(400).json("you cannot rate task")}
   } catch (error) {
     console.log(error);
-    res.json({
-      status: 0,
-      message: error,
+   res.status(400).json(error)
+  }
+};
+const changePassword = async (req, res) => {
+  try {
+    const data = validationResult(req)
+    if (!data.isEmpty()) {
+       res.status(400).json(data)
+    }
+    let user = await dbops.admindata.findOne({
+      where: { username: req.body.username },
     });
+    if (!user) {
+      res.status(400).json("invalid username");
+    }
+     else
+      {
+      if(user.role==="manager"||user.role==="user")
+      {
+      let saltRounds = await bcrypt.genSalt(10);
+      let passwordNew = await bcrypt.hashSync(req.body.newpassword, saltRounds);
+      await dbops.admindata.update(
+        { password: passwordNew },
+        { where: { username: req.body.username } }
+      );
+      res.status(200).json("password updated");
+    }
+    else{
+      res.status(400).json('you are not authorized for above action')
+    }
+  }
+  } catch (error) {
+    console.log(error);
+   res.status(400).json("invalid user")
   }
 };
 module.exports = {
@@ -184,5 +201,5 @@ module.exports = {
   updateTask,
   assigntask,
   deletetask,
-  rateTask,
+  rateTask,changePassword
 };
